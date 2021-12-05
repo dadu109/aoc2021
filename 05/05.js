@@ -12,10 +12,10 @@ const getLine = (str) => {
     return {x1, y1, x2, y2};
 }
 
-const getAllPointInLine = (line) => {
+const getPointInStraightLine = (line) => {
     const {x1, y1, x2, y2} = line;
 
-    if(!(x1 === x2 || y1 === y2)) return [];
+    if(!(x1 === x2 || y1 === y2)) return getPointsOnDiagonal(line);
 
     const points = [];
     let x = x1;
@@ -38,9 +38,69 @@ const getAllPointInLine = (line) => {
     return points;
 }
 
+
+const getPointsOnDiagonal = (line) => {
+    const {x1, y1, x2, y2} = line;
+
+    const points = [];
+
+    let x, y;
+   
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+
+    if (dx>0 && dy>0) {
+        x = x1;
+        y = y1;
+
+        while (x <= x2 && y <= y2) {
+            points.push(`${[x, y]}`);
+            x++;
+            y++;
+        }
+
+        return points;
+    } else if (dx<0 && dy>0) {
+        x = x1;
+        y = y1;
+
+        while (x >= x2 && y <= y2) {
+            points.push(`${[x, y]}`);
+            x--;
+            y++;
+        }
+
+        return points;
+    } else if (dx<0 && dy<0) {
+        x = x1;
+        y = y1;
+
+        while (x >= x2 && y >= y2) {
+            points.push(`${[x, y]}`);
+            x--;
+            y--;
+        }
+
+        return points;
+    } else if (dx>0 && dy<0) {
+        x = x1;
+        y = y1;
+
+        while (x <= x2 && y >= y2) {
+            points.push(`${[x, y]}`);
+            x++;
+            y--;
+        }
+
+        return points;
+    }
+}
+
+
+
 const getOverlapingPoints = (line1, line2) => {
-    const points1 = getAllPointInLine(line1);
-    const points2 = getAllPointInLine(line2);
+    const points1 = getPointInStraightLine(line1);
+    const points2 = getPointInStraightLine(line2);
 
     const points = points1.filter(point => points2.includes(point));
 
@@ -69,4 +129,4 @@ for(let i = 0; i < lines.length; i++) {
 }
 
 
-console.log(Object.keys(allOverlapingPoints).length)
+console.log(Object.keys(allOverlapingPoints).length);
