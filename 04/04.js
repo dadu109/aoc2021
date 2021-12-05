@@ -92,7 +92,7 @@ const checkBoards = (boards) => {
 }
 
 const checkLastWin = (boards) => {
-    let lastWin = false;
+    const winBoards = [];
 
     for (let i = 0; i < queue.length; i++) {
         const val = queue[i];
@@ -103,16 +103,22 @@ const checkLastWin = (boards) => {
             vert = checkVertical(boards[j])
             hori = checkHorizontal(boards[j])
 
-            if(vert || hori) {
-                lastWin = {
-                    board: boards[j],
+            if((vert || hori) && !winBoards.find(e => e.boardIndex === j)) {
+                winBoards.push({
+                    boardIndex: j,
+                    board: JSON.parse(JSON.stringify(boards[j])),
                     value: val
-                }
+                })
             }
         }
     }
 
-    return lastWin;
+    const lastWinBoard = winBoards.pop()
+
+    return {
+        board: lastWinBoard.board,
+        value: lastWinBoard.value
+    }
 }
 
 const getUnmarkedValuesSum = (board) => {
@@ -129,7 +135,8 @@ const getUnmarkedValuesSum = (board) => {
     return sum;
 }
 
-const winner = checkBoards(boards);
+
+const winner = checkLastWin(boards);
 const uncheckedSum = getUnmarkedValuesSum(winner.board);
 
 console.log(uncheckedSum * winner.value);
