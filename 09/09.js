@@ -14,7 +14,7 @@ for (let i = 0; i < rows.length; i++) {
         //up left
         if(rows[i-1] === undefined && rows[i][j-1] === undefined) {
             if(rows[i+1][j] > cell && cell < rows[i][j+1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -22,7 +22,7 @@ for (let i = 0; i < rows.length; i++) {
         //up right
         if(rows[i+1] === undefined && rows[i][j-1] === undefined) {
             if(rows[i-1][j] > cell && cell < rows[i][j+1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -30,7 +30,7 @@ for (let i = 0; i < rows.length; i++) {
         //down left
         if(rows[i-1] === undefined && rows[i][j+1] === undefined) {
             if(rows[i+1][j] > cell && cell < rows[i][j-1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -38,7 +38,7 @@ for (let i = 0; i < rows.length; i++) {
         //down right
         if(rows[i+1] === undefined && rows[i][j+1] === undefined) {
             if(rows[i-1][j] > cell && cell < rows[i][j-1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -46,7 +46,7 @@ for (let i = 0; i < rows.length; i++) {
         //up
         if(rows[i][j-1] === undefined) {
             if(rows[i+1][j] > cell && cell < rows[i-1][j] && cell < rows[i][j+1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -54,7 +54,7 @@ for (let i = 0; i < rows.length; i++) {
         //down
         if(rows[i][j+1] === undefined) {
             if(rows[i-1][j] > cell && cell < rows[i+1][j] && cell < rows[i][j-1]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -62,7 +62,7 @@ for (let i = 0; i < rows.length; i++) {
         //left
         if(rows[i-1] === undefined) {
             if(rows[i][j+1] > cell && cell < rows[i][j-1] && cell < rows[i+1][j]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
@@ -70,15 +70,51 @@ for (let i = 0; i < rows.length; i++) {
         //right
         if(rows[i+1] === undefined) {
             if(rows[i][j-1] > cell && cell < rows[i][j+1] && cell < rows[i-1][j]) {
-                lowest.push(cell)
+                lowest.push([i,j])
             }
             continue;
         }
 
         if(rows[i][j-1] > cell && cell < rows[i][j+1] && cell < rows[i-1][j] && cell < rows[i+1][j]) {
-            lowest.push(cell)
+            lowest.push([i,j])
         }
     }
 }
 
-console.log(lowest.reduce((p,q) => p+q+1, 0))
+
+function getBasinSize(inputI, inputJ, seenDict) {
+    const neighbours = [
+        [inputI - 1, inputJ],
+        [inputI + 1, inputJ],
+        [inputI, inputJ - 1],
+        [inputI, inputJ + 1]
+    ]
+
+    let count = 1;
+
+    for (const [i, j] of neighbours) {
+        if (!seenDict[i]) {
+            seenDict[i] = {};
+        } else if (seenDict[i][j]) continue;
+
+        seenDict[i][j] = true;
+
+        if (rows[i] === undefined || rows[i][j] === undefined) continue;
+        else if (rows[i][j] < 9) {
+            count += getBasinSize(i, j, seenDict)
+        };
+    }
+
+    return count;
+}
+
+const answer = lowest.map(([i,j]) => {
+    const seenDict = {
+        [i]: {[j]: true}
+    };
+    return getBasinSize(i, j, seenDict);
+})
+
+const answers = answer.sort((a,b) => b - a);
+
+console.log(answers[0] * answers[1] * answers[2])
